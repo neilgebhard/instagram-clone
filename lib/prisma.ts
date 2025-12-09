@@ -10,8 +10,11 @@ const globalForPrisma = globalThis as unknown as {
   pool: typeof Pool.prototype | undefined
 }
 
+// Remove sslmode from connection string and handle SSL separately
+const connectionString = process.env.DATABASE_URL?.replace(/\?sslmode=\w+/, '')
+
 const pool = globalForPrisma.pool ?? new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString,
   ssl: {
     rejectUnauthorized: false
   }

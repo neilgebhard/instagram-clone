@@ -2,8 +2,11 @@ import { NextResponse } from 'next/server'
 import { Pool } from 'pg'
 
 export async function GET() {
+  // Remove sslmode from connection string and handle SSL separately
+  const connectionString = process.env.DATABASE_URL?.replace(/\?sslmode=\w+/, '')
+
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString,
     ssl: {
       rejectUnauthorized: false
     }
