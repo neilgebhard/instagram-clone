@@ -5,6 +5,9 @@ import { auth } from '@/lib/auth'
 import { notFound } from 'next/navigation'
 
 export async function getUserProfileByUsername(username: string) {
+  const session = await auth()
+  const userId = session?.user?.id
+
   const user = await prisma.user.findUnique({
     where: { username },
     select: {
@@ -20,11 +23,12 @@ export async function getUserProfileByUsername(username: string) {
           imageUrl: true,
           caption: true,
           createdAt: true,
-        },
-      },
-      _count: {
-        select: {
-          posts: true,
+          likes: {
+            select: {
+              id: true,
+              userId: true,
+            },
+          },
         },
       },
     },
@@ -34,7 +38,22 @@ export async function getUserProfileByUsername(username: string) {
     notFound()
   }
 
-  return user
+  return {
+    ...user,
+    _count: {
+      posts: user.posts.length,
+    },
+    posts: user.posts.map((post) => ({
+      id: post.id,
+      imageUrl: post.imageUrl,
+      caption: post.caption,
+      createdAt: post.createdAt,
+      _count: {
+        likes: post.likes.length,
+      },
+      likes: userId ? post.likes.filter((like) => like.userId === userId) : [],
+    })),
+  }
 }
 
 export async function checkIsOwnProfile(username: string) {

@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import LikeButton from './LikeButton'
 
 type PostCardProps = {
   post: {
@@ -12,10 +13,17 @@ type PostCardProps = {
       username: string
       avatar: string | null
     }
+    _count: {
+      likes: number
+    }
+    likes: Array<{ id: string }>
   }
 }
 
 export default function PostCard({ post }: PostCardProps) {
+  const isLiked = post.likes.length > 0
+  const likeCount = post._count.likes
+
   return (
     <div>
       <div>
@@ -30,6 +38,8 @@ export default function PostCard({ post }: PostCardProps) {
           height={500}
         />
       </div>
+
+      <LikeButton postId={post.id} initialLiked={isLiked} initialLikeCount={likeCount} />
 
       <div>
         {post.caption && (

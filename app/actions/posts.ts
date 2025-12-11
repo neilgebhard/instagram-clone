@@ -33,12 +33,19 @@ export async function createPost(data: { imageUrl: string; caption?: string }) {
 }
 
 export async function getPosts() {
+  const session = await auth()
+  const userId = session?.user?.id
+
   const posts = await prisma.post.findMany({
     take: 20,
     orderBy: {
       createdAt: 'desc',
     },
-    include: {
+    select: {
+      id: true,
+      imageUrl: true,
+      caption: true,
+      createdAt: true,
       user: {
         select: {
           id: true,
@@ -46,8 +53,24 @@ export async function getPosts() {
           avatar: true,
         },
       },
+      likes: {
+        select: {
+          id: true,
+          userId: true,
+        },
+      },
     },
   })
 
-  return posts
+  return posts.map((post) => ({
+    id: post.id,
+    imageUrl: post.imageUrl,
+    caption: post.caption,
+    createdAt: post.createdAt,
+    user: post.user,
+    _count: {
+      likes: post.likes.length,
+    },
+    likes: userId ? post.likes.filter((like) => like.userId === userId) : [],
+  }))
 }
