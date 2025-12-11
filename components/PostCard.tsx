@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 
 type PostCardProps = {
   post: {
@@ -18,7 +19,7 @@ export default function PostCard({ post }: PostCardProps) {
   return (
     <div>
       <div>
-        <span>{post.user.username}</span>
+        <Link href={`/${post.user.username}`}>{post.user.username}</Link>
       </div>
 
       <div>
@@ -33,7 +34,7 @@ export default function PostCard({ post }: PostCardProps) {
       <div>
         {post.caption && (
           <p>
-            <span>{post.user.username}</span>
+            <Link href={`/${post.user.username}`}>{post.user.username}</Link>
             {post.caption}
           </p>
         )}

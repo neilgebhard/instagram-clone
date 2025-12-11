@@ -28,8 +28,7 @@ export async function createPost(data: { imageUrl: string; caption?: string }) {
     },
   })
 
-  revalidatePath('/profile')
-  revalidatePath('/')
+  revalidatePath('/', 'layout')
   return post
 }
 
