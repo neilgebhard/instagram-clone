@@ -1,15 +1,9 @@
-'use client'
-
-import { useSession } from 'next-auth/react'
+import { auth } from '@/lib/auth'
 import LoginForm from '@/components/LoginForm'
 import HomePage from '@/components/HomePage'
 
-export default function Home() {
-  const { data: session, status } = useSession()
-
-  if (status === 'loading') {
-    return <div>Loading...</div>
-  }
+export default async function Home() {
+  const session = await auth()
 
   if (session) {
     return <HomePage />

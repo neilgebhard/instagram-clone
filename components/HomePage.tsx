@@ -1,22 +1,35 @@
-'use client'
+import { getPosts } from '@/app/actions/posts'
+import PostCard from './PostCard'
+import SignOutButton from './SignOutButton'
+import Link from 'next/link'
 
-import { signOut, useSession } from 'next-auth/react'
-
-export default function HomePage() {
-  const { data: session } = useSession()
+export default async function HomePage() {
+  const posts = await getPosts()
 
   return (
     <div>
-      <h1>Welcome to Instagram Clone</h1>
-      <p>Hello, {session?.user?.email}</p>
+      <header>
+        <h1>Instagram Clone</h1>
+        <div>
+          <Link href='/create'>Create Post</Link>
+          <SignOutButton />
+        </div>
+      </header>
 
-      {/* Add your actual app content here */}
-      <div>
-        <h2>Your Feed</h2>
-        <p>This is where your Instagram clone app content will go</p>
-      </div>
-
-      <button onClick={() => signOut()}>Sign out</button>
+      <main>
+        {posts.length === 0 ? (
+          <div>
+            <p>No posts yet</p>
+            <Link href='/create'>Create the first post</Link>
+          </div>
+        ) : (
+          <div>
+            {posts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+        )}
+      </main>
     </div>
   )
 }

@@ -1,8 +1,7 @@
-// app/actions/posts.ts
 'use server'
 
 import { getUploadUrl } from '@/lib/s3'
-import { auth } from '@/lib/auth' // Your auth helper
+import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 
@@ -30,5 +29,26 @@ export async function createPost(data: { imageUrl: string; caption?: string }) {
   })
 
   revalidatePath('/profile')
+  revalidatePath('/')
   return post
+}
+
+export async function getPosts() {
+  const posts = await prisma.post.findMany({
+    take: 20,
+    orderBy: {
+      createdAt: 'desc',
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          avatar: true,
+        },
+      },
+    },
+  })
+
+  return posts
 }
