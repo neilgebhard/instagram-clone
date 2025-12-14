@@ -12,9 +12,11 @@ export default async function ProfilePage({ params }: Props) {
   const isOwnProfile = await checkIsOwnProfile(username)
 
   return (
-    <div>
+    <div className='bg-gray-50 min-h-screen'>
       <ProfileHeader user={userProfile} isOwnProfile={isOwnProfile} />
-      <PostsGrid posts={userProfile.posts} />
+      <div className='pt-12'>
+        <PostsGrid posts={userProfile.posts} />
+      </div>
     </div>
   )
 }

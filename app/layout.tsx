@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Providers } from './providers'
+import Topbar from '@/components/Topbar'
 
 export const metadata: Metadata = {
   title: 'Instagram Clone',
@@ -15,7 +16,10 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Topbar />
+          {children}
+        </Providers>
       </body>
     </html>
   )

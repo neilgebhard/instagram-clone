@@ -58,18 +58,6 @@ export default function CreatePostPage() {
 
   return (
     <div className='min-h-screen bg-gray-50'>
-      <header className='bg-white border-b border-gray-300 sticky top-0 z-50'>
-        <div className='max-w-5xl mx-auto px-4 h-16 flex items-center justify-between'>
-          <h1 className='text-xl font-semibold'>Create New Post</h1>
-          <button
-            onClick={() => router.push('/')}
-            className='text-sm text-gray-600 hover:text-gray-900 cursor-pointer'
-          >
-            Cancel
-          </button>
-        </div>
-      </header>
-
       <main className='max-w-2xl mx-auto py-8 px-4'>
         <form onSubmit={handleSubmit} className='bg-white border border-gray-300 rounded-sm overflow-hidden'>
           <div className='p-6 space-y-6'>

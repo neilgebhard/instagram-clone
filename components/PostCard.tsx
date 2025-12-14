@@ -73,7 +73,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
       </div>
 
       {/* Like Button */}
-      <div className='px-4 pt-3'>
+      <div className='px-4 py-3'>
         <LikeButton postId={post.id} initialLiked={isLiked} initialLikeCount={likeCount} />
       </div>
 

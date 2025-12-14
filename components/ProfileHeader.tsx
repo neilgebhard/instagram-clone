@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import EditProfileButton from './EditProfileButton'
+import SignOutButton from './SignOutButton'
 
 type ProfileHeaderProps = {
   user: {
@@ -17,8 +18,8 @@ type ProfileHeaderProps = {
 
 export default function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
   return (
-    <div className='bg-white border-b border-gray-300'>
-      <div className='max-w-4xl mx-auto px-4 py-8'>
+    <div className='bg-gray-50'>
+      <div className='max-w-4xl mx-auto px-4 py-12'>
         <div className='flex flex-col md:flex-row gap-8 md:gap-12'>
           {/* Avatar */}
           <div className='flex justify-center md:justify-start'>
@@ -43,7 +44,12 @@ export default function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps
           <div className='flex-1 space-y-6'>
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4'>
               <h1 className='text-xl font-light'>{user.username}</h1>
-              {isOwnProfile && <EditProfileButton />}
+              {isOwnProfile && (
+                <>
+                  <EditProfileButton />
+                  <SignOutButton />
+                </>
+              )}
             </div>
 
             <div className='flex gap-8'>
