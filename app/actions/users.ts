@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import { notFound } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { getAvatarUploadUrl } from '@/lib/s3'
 
 export async function getUserProfileByUsername(username: string) {
   const session = await auth()
@@ -82,16 +83,35 @@ export async function getCurrentUser() {
       username: true,
       email: true,
       bio: true,
+      avatar: true,
     },
   })
 
   return user
 }
 
+export async function getPresignedUrlForAvatar(
+  filename: string,
+  contentType: string
+) {
+  const session = await auth()
+  if (!session?.user?.id) {
+    throw new Error('Unauthorized')
+  }
+
+  const { uploadUrl, publicUrl } = await getAvatarUploadUrl(
+    filename,
+    contentType
+  )
+
+  return { uploadUrl, publicUrl }
+}
+
 type UpdateProfileData = {
   username: string
   email: string
   bio: string | null
+  avatar?: string | null
 }
 
 export async function updateUserProfile(data: UpdateProfileData) {
@@ -181,18 +201,31 @@ export async function updateUserProfile(data: UpdateProfileData) {
     }
 
     // Update user
+    const updateData: {
+      username: string
+      email: string
+      bio: string | null
+      avatar?: string | null
+    } = {
+      username,
+      email,
+      bio,
+    }
+
+    // Only update avatar if provided
+    if (data.avatar !== undefined) {
+      updateData.avatar = data.avatar
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
-      data: {
-        username,
-        email,
-        bio,
-      },
+      data: updateData,
       select: {
         id: true,
         username: true,
         email: true,
         bio: true,
+        avatar: true,
       },
     })
 

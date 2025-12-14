@@ -2,13 +2,19 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { getCurrentUser, updateUserProfile } from '@/app/actions/users'
+import Image from 'next/image'
+import {
+  getCurrentUser,
+  updateUserProfile,
+  getPresignedUrlForAvatar,
+} from '@/app/actions/users'
 
 type User = {
   id: string
   username: string
   email: string
   bio: string | null
+  avatar: string | null
 }
 
 export default function EditProfilePage() {
@@ -22,6 +28,8 @@ export default function EditProfilePage() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
 
   useEffect(() => {
     async function loadUser() {
@@ -52,16 +60,50 @@ export default function EditProfilePage() {
     }
   }
 
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file) {
+      setAvatarFile(file)
+      setAvatarPreview(URL.createObjectURL(file))
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setErrors({})
     setIsSubmitting(true)
 
     try {
+      let avatarUrl: string | null | undefined = undefined
+
+      // Upload avatar if new file selected
+      if (avatarFile) {
+        try {
+          const { uploadUrl, publicUrl } = await getPresignedUrlForAvatar(
+            avatarFile.name,
+            avatarFile.type
+          )
+
+          await fetch(uploadUrl, {
+            method: 'PUT',
+            body: avatarFile,
+            headers: {
+              'Content-Type': avatarFile.type,
+            },
+          })
+
+          avatarUrl = publicUrl
+        } catch (error) {
+          setErrors({ avatar: 'Failed to upload avatar. Please try again.' })
+          return
+        }
+      }
+
       const result = await updateUserProfile({
         username: formData.username,
         email: formData.email,
         bio: formData.bio || null,
+        avatar: avatarUrl,
       })
 
       if (!result.success) {
@@ -94,6 +136,37 @@ export default function EditProfilePage() {
 
       <form onSubmit={handleSubmit}>
         {errors.general && <p>{errors.general}</p>}
+
+        <div>
+          <label>Avatar</label>
+          <div>
+            {avatarPreview ? (
+              <Image
+                src={avatarPreview}
+                alt='Avatar preview'
+                width={150}
+                height={150}
+              />
+            ) : user.avatar ? (
+              <Image
+                src={user.avatar}
+                alt='Current avatar'
+                width={150}
+                height={150}
+              />
+            ) : (
+              <div>
+                <span>{user.username.charAt(0).toUpperCase()}</span>
+              </div>
+            )}
+          </div>
+          <input
+            type='file'
+            accept='image/*'
+            onChange={handleAvatarChange}
+          />
+          {errors.avatar && <p>{errors.avatar}</p>}
+        </div>
 
         <div>
           <label>Username</label>

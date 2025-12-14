@@ -24,3 +24,18 @@ export async function getUploadUrl(filename: string, contentType: string) {
 
   return { uploadUrl, publicUrl, key }
 }
+
+export async function getAvatarUploadUrl(filename: string, contentType: string) {
+  const key = `avatars/${Date.now()}-${filename}`
+
+  const command = new PutObjectCommand({
+    Bucket: process.env.AWS_S3_BUCKET_NAME!,
+    Key: key,
+    ContentType: contentType,
+  })
+
+  const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 })
+  const publicUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
+
+  return { uploadUrl, publicUrl, key }
+}
