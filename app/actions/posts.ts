@@ -59,6 +59,24 @@ export async function getPosts() {
           userId: true,
         },
       },
+      comments: {
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          userId: true,
+          user: {
+            select: {
+              id: true,
+              username: true,
+              avatar: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
+      },
     },
   })
 
@@ -70,7 +88,9 @@ export async function getPosts() {
     user: post.user,
     _count: {
       likes: post.likes.length,
+      comments: post.comments.length,
     },
     likes: userId ? post.likes.filter((like) => like.userId === userId) : [],
+    comments: post.comments,
   }))
 }

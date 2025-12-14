@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import LikeButton from './LikeButton'
+import CommentSection from './CommentSection'
 
 type PostCardProps = {
   post: {
@@ -15,12 +16,25 @@ type PostCardProps = {
     }
     _count: {
       likes: number
+      comments: number
     }
     likes: Array<{ id: string }>
+    comments: Array<{
+      id: string
+      content: string
+      createdAt: Date
+      userId: string
+      user: {
+        id: string
+        username: string
+        avatar: string | null
+      }
+    }>
   }
+  currentUserId?: string
 }
 
-export default function PostCard({ post }: PostCardProps) {
+export default function PostCard({ post, currentUserId }: PostCardProps) {
   const isLiked = post.likes.length > 0
   const likeCount = post._count.likes
 
@@ -56,6 +70,12 @@ export default function PostCard({ post }: PostCardProps) {
           })}
         </time>
       </div>
+
+      <CommentSection
+        postId={post.id}
+        initialComments={post.comments}
+        currentUserId={currentUserId}
+      />
     </div>
   )
 }

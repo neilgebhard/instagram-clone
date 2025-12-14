@@ -1,10 +1,13 @@
 import { getPosts } from '@/app/actions/posts'
+import { auth } from '@/lib/auth'
 import PostCard from './PostCard'
 import SignOutButton from './SignOutButton'
 import Link from 'next/link'
 
 export default async function HomePage() {
   const posts = await getPosts()
+  const session = await auth()
+  const currentUserId = session?.user?.id
 
   return (
     <div>
@@ -25,7 +28,7 @@ export default async function HomePage() {
         ) : (
           <div>
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <PostCard key={post.id} post={post} currentUserId={currentUserId} />
             ))}
           </div>
         )}
