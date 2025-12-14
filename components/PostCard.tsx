@@ -39,30 +39,55 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const likeCount = post._count.likes
 
   return (
-    <div>
-      <div>
-        <Link href={`/${post.user.username}`}>{post.user.username}</Link>
+    <article className='bg-white border border-gray-300 rounded-sm'>
+      {/* Post Header */}
+      <div className='flex items-center gap-3 px-4 py-3'>
+        <Link href={`/${post.user.username}`} className='flex items-center gap-3 hover:opacity-70'>
+          {post.user.avatar ? (
+            <Image
+              src={post.user.avatar}
+              alt={post.user.username}
+              width={32}
+              height={32}
+              className='rounded-full'
+            />
+          ) : (
+            <div className='w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center'>
+              <span className='text-gray-600 font-semibold text-sm'>
+                {post.user.username[0].toUpperCase()}
+              </span>
+            </div>
+          )}
+          <span className='font-semibold text-sm'>{post.user.username}</span>
+        </Link>
       </div>
 
-      <div>
+      {/* Post Image */}
+      <div className='relative w-full aspect-square bg-gray-100'>
         <Image
           src={post.imageUrl}
           alt={post.caption || 'Post image'}
-          width={500}
-          height={500}
+          fill
+          className='object-cover'
         />
       </div>
 
-      <LikeButton postId={post.id} initialLiked={isLiked} initialLikeCount={likeCount} />
+      {/* Like Button */}
+      <div className='px-4 pt-3'>
+        <LikeButton postId={post.id} initialLiked={isLiked} initialLikeCount={likeCount} />
+      </div>
 
-      <div>
+      {/* Caption and Timestamp */}
+      <div className='px-4 pb-3'>
         {post.caption && (
-          <p>
-            <Link href={`/${post.user.username}`}>{post.user.username}</Link>
-            {post.caption}
+          <p className='text-sm mb-2'>
+            <Link href={`/${post.user.username}`} className='font-semibold hover:opacity-70 mr-2'>
+              {post.user.username}
+            </Link>
+            <span>{post.caption}</span>
           </p>
         )}
-        <time>
+        <time className='text-xs text-gray-500 uppercase'>
           {new Date(post.createdAt).toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
@@ -71,11 +96,12 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
         </time>
       </div>
 
+      {/* Comments Section */}
       <CommentSection
         postId={post.id}
         initialComments={post.comments}
         currentUserId={currentUserId}
       />
-    </div>
+    </article>
   )
 }
