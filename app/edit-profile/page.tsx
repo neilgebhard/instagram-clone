@@ -123,7 +123,14 @@ export default function EditProfilePage() {
   }
 
   if (loading) {
-    return <div>Loading...</div>
+    return (
+      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+        <div className='text-center'>
+          <div className='inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900'></div>
+          <p className='mt-2 text-gray-600'>Loading...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!user) {
@@ -131,94 +138,153 @@ export default function EditProfilePage() {
   }
 
   return (
-    <div>
-      <h1>Edit Profile</h1>
+    <div className='min-h-screen bg-gray-50'>
+      <header className='bg-white border-b border-gray-300 sticky top-0 z-50'>
+        <div className='max-w-5xl mx-auto px-4 h-16 flex items-center'>
+          <h1 className='text-xl font-semibold'>Edit Profile</h1>
+        </div>
+      </header>
 
-      <form onSubmit={handleSubmit}>
-        {errors.general && <p>{errors.general}</p>}
+      <main className='max-w-2xl mx-auto py-8 px-4'>
+        <form onSubmit={handleSubmit} className='bg-white border border-gray-300 rounded-sm'>
+          {errors.general && (
+            <div className='px-6 pt-6'>
+              <p className='text-red-500 text-sm text-center bg-red-50 border border-red-200 rounded p-3'>
+                {errors.general}
+              </p>
+            </div>
+          )}
 
-        <div>
-          <label>Avatar</label>
-          <div>
-            {avatarPreview ? (
-              <Image
-                src={avatarPreview}
-                alt='Avatar preview'
-                width={150}
-                height={150}
-              />
-            ) : user.avatar ? (
-              <Image
-                src={user.avatar}
-                alt='Current avatar'
-                width={150}
-                height={150}
-              />
-            ) : (
-              <div>
-                <span>{user.username.charAt(0).toUpperCase()}</span>
+          <div className='p-6 space-y-6'>
+            {/* Avatar Section */}
+            <div className='flex items-center gap-6'>
+              <div className='flex-shrink-0'>
+                {avatarPreview ? (
+                  <Image
+                    src={avatarPreview}
+                    alt='Avatar preview'
+                    width={80}
+                    height={80}
+                    className='rounded-full'
+                  />
+                ) : user.avatar ? (
+                  <Image
+                    src={user.avatar}
+                    alt='Current avatar'
+                    width={80}
+                    height={80}
+                    className='rounded-full'
+                  />
+                ) : (
+                  <div className='w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center'>
+                    <span className='text-white text-3xl font-bold'>
+                      {user.username.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
               </div>
-            )}
+              <div className='flex-1'>
+                <p className='font-semibold mb-2'>{user.username}</p>
+                <label className='inline-block px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-lg cursor-pointer transition-colors'>
+                  Change Photo
+                  <input
+                    type='file'
+                    accept='image/*'
+                    onChange={handleAvatarChange}
+                    className='hidden'
+                  />
+                </label>
+                {errors.avatar && (
+                  <p className='text-red-500 text-sm mt-2'>{errors.avatar}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Username Field */}
+            <div>
+              <label htmlFor='username' className='block text-sm font-semibold mb-2'>
+                Username
+              </label>
+              <input
+                id='username'
+                type='text'
+                name='username'
+                value={formData.username}
+                onChange={handleChange}
+                required
+                minLength={3}
+                maxLength={30}
+                className='w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 text-sm'
+              />
+              {errors.username && (
+                <p className='text-red-500 text-sm mt-1'>{errors.username}</p>
+              )}
+            </div>
+
+            {/* Email Field */}
+            <div>
+              <label htmlFor='email' className='block text-sm font-semibold mb-2'>
+                Email
+              </label>
+              <input
+                id='email'
+                type='email'
+                name='email'
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className='w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 text-sm'
+              />
+              {errors.email && (
+                <p className='text-red-500 text-sm mt-1'>{errors.email}</p>
+              )}
+            </div>
+
+            {/* Bio Field */}
+            <div>
+              <label htmlFor='bio' className='block text-sm font-semibold mb-2'>
+                Bio
+              </label>
+              <textarea
+                id='bio'
+                name='bio'
+                value={formData.bio}
+                onChange={handleChange}
+                placeholder='Tell us about yourself...'
+                rows={4}
+                maxLength={150}
+                className='w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 text-sm resize-none'
+              />
+              <p className='text-xs text-gray-500 mt-1'>
+                {formData.bio.length}/150 characters
+              </p>
+              {errors.bio && (
+                <p className='text-red-500 text-sm mt-1'>{errors.bio}</p>
+              )}
+            </div>
           </div>
-          <input
-            type='file'
-            accept='image/*'
-            onChange={handleAvatarChange}
-          />
-          {errors.avatar && <p>{errors.avatar}</p>}
-        </div>
 
-        <div>
-          <label>Username</label>
-          <input
-            type='text'
-            name='username'
-            value={formData.username}
-            onChange={handleChange}
-            required
-            minLength={3}
-            maxLength={30}
-          />
-          {errors.username && <p>{errors.username}</p>}
-        </div>
+          {/* Action Buttons */}
+          <div className='border-t border-gray-300 p-4 flex gap-3'>
+            <button
+              type='submit'
+              disabled={isSubmitting}
+              className='flex-1 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
+            >
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </button>
 
-        <div>
-          <label>Email</label>
-          <input
-            type='email'
-            name='email'
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-          {errors.email && <p>{errors.email}</p>}
-        </div>
-
-        <div>
-          <label>Bio</label>
-          <textarea
-            name='bio'
-            value={formData.bio}
-            onChange={handleChange}
-            placeholder='Tell us about yourself...'
-            rows={4}
-            maxLength={150}
-          />
-          {errors.bio && <p>{errors.bio}</p>}
-        </div>
-
-        <button type='submit' disabled={isSubmitting}>
-          {isSubmitting ? 'Saving...' : 'Save Changes'}
-        </button>
-
-        <button
-          type='button'
-          onClick={() => router.push(`/${user.username}`)}
-          disabled={isSubmitting}
-        >
-          Cancel
-        </button>
-      </form>
+            <button
+              type='button'
+              onClick={() => router.push(`/${user.username}`)}
+              disabled={isSubmitting}
+              className='flex-1 py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors'
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </main>
     </div>
   )
 }
