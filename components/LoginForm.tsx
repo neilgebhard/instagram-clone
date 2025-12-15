@@ -30,8 +30,8 @@ export default function LoginForm() {
       if (result?.error) {
         setError('Invalid email or password')
       } else {
-        router.push('/')
         router.refresh()
+        router.push('/')
       }
     } finally {
       setIsLoading(false)
