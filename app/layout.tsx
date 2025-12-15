@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { Providers } from './providers'
 import Topbar from '@/components/Topbar'
+import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
   title: 'Instagram Clone',
@@ -15,10 +16,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body>
+      <body className='flex flex-col min-h-screen'>
         <Providers>
           <Topbar />
           {children}
+          <Footer />
         </Providers>
       </body>
     </html>
