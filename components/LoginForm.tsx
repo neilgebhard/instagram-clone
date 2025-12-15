@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { AiFillInstagram } from 'react-icons/ai'
 
 export default function LoginForm() {
   const router = useRouter()
@@ -49,7 +50,7 @@ export default function LoginForm() {
       <div className='max-w-md w-full space-y-4'>
         <div className='bg-white border border-gray-300 rounded-sm p-10'>
           <div className='text-center mb-8'>
-            <h1 className='text-4xl font-bold mb-6 font-serif italic'>Instagram</h1>
+            <AiFillInstagram className='text-6xl mx-auto mb-6' />
           </div>
 
           <form onSubmit={handleSubmit} className='space-y-3'>

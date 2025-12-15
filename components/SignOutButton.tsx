@@ -5,7 +5,7 @@ import { signOut } from 'next-auth/react'
 export default function SignOutButton() {
   return (
     <button
-      onClick={() => signOut()}
+      onClick={() => signOut({ callbackUrl: '/' })}
       className='text-sm font-semibold text-gray-700 hover:text-gray-900 cursor-pointer'
     >
       Sign out

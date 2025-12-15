@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { AiFillInstagram } from 'react-icons/ai'
 
 export default function SignUpPage() {
   const router = useRouter()
@@ -65,7 +66,7 @@ export default function SignUpPage() {
       <div className='max-w-md w-full space-y-4'>
         <div className='bg-white border border-gray-300 rounded-sm p-10'>
           <div className='text-center mb-8'>
-            <h1 className='text-4xl font-bold mb-6 font-serif italic'>Instagram</h1>
+            <AiFillInstagram className='text-6xl mx-auto mb-6' />
             <p className='text-gray-500 font-semibold text-base mb-4'>
               Sign up to see photos and videos from your friends.
             </p>
