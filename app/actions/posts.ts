@@ -32,6 +32,32 @@ export async function createPost(data: { imageUrl: string; caption?: string }) {
   return post
 }
 
+export async function deletePost(postId: string) {
+  const session = await auth()
+  if (!session?.user?.id) {
+    throw new Error('Unauthorized')
+  }
+
+  const post = await prisma.post.findUnique({
+    where: { id: postId },
+  })
+
+  if (!post) {
+    throw new Error('Post not found')
+  }
+
+  if (post.userId !== session.user.id) {
+    throw new Error('You can only delete your own posts')
+  }
+
+  await prisma.post.delete({
+    where: { id: postId },
+  })
+
+  revalidatePath('/', 'layout')
+  return { success: true }
+}
+
 export async function getPosts() {
   const session = await auth()
   const userId = session?.user?.id

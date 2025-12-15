@@ -15,7 +15,7 @@ export default async function ProfilePage({ params }: Props) {
     <div className='bg-gray-50 min-h-screen'>
       <ProfileHeader user={userProfile} isOwnProfile={isOwnProfile} />
       <div className='pt-12'>
-        <PostsGrid posts={userProfile.posts} />
+        <PostsGrid posts={userProfile.posts} isOwnProfile={isOwnProfile} />
       </div>
     </div>
   )

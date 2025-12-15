@@ -1,4 +1,9 @@
+'use client'
+
+import { useState, useTransition } from 'react'
 import Image from 'next/image'
+import { BsTrash } from 'react-icons/bs'
+import { deletePost } from '@/app/actions/posts'
 
 type PostsGridProps = {
   posts: {
@@ -7,10 +12,40 @@ type PostsGridProps = {
     caption: string | null
     createdAt: Date
   }[]
+  isOwnProfile?: boolean
 }
 
-export default function PostsGrid({ posts }: PostsGridProps) {
-  if (posts.length === 0) {
+export default function PostsGrid({ posts, isOwnProfile }: PostsGridProps) {
+  const [deletedPosts, setDeletedPosts] = useState<Set<string>>(new Set())
+  const [isPending, startTransition] = useTransition()
+
+  function handleDelete(postId: string, event: React.MouseEvent) {
+    event.stopPropagation()
+
+    if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+      return
+    }
+
+    setDeletedPosts((prev) => new Set([...prev, postId]))
+
+    startTransition(async () => {
+      try {
+        await deletePost(postId)
+      } catch (error) {
+        console.error('Failed to delete post:', error)
+        setDeletedPosts((prev) => {
+          const next = new Set(prev)
+          next.delete(postId)
+          return next
+        })
+        alert('Failed to delete post. Please try again.')
+      }
+    })
+  }
+
+  const visiblePosts = posts.filter((post) => !deletedPosts.has(post.id))
+
+  if (visiblePosts.length === 0) {
     return (
       <div className='bg-gray-50 py-20'>
         <div className='text-center'>
@@ -46,14 +81,31 @@ export default function PostsGrid({ posts }: PostsGridProps) {
     <div className='bg-gray-50'>
       <div className='max-w-4xl mx-auto'>
         <div className='grid grid-cols-3 gap-1'>
-          {posts.map((post) => (
-            <div key={post.id} className='relative aspect-square bg-gray-100 overflow-hidden group cursor-pointer'>
+          {visiblePosts.map((post) => (
+            <div
+              key={post.id}
+              className='relative aspect-square bg-gray-100 overflow-hidden group'
+            >
               <Image
                 src={post.imageUrl}
                 alt={post.caption || 'Post image'}
                 fill
-                className='object-cover group-hover:opacity-90 transition-opacity'
+                className='object-cover'
               />
+
+              {isOwnProfile && (
+                <>
+                  <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-30 transition-opacity pointer-events-none' />
+                  <button
+                    onClick={(e) => handleDelete(post.id, e)}
+                    disabled={isPending}
+                    aria-label='Delete post'
+                    className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 text-white p-3 rounded-full disabled:opacity-50 cursor-pointer z-10'
+                  >
+                    <BsTrash className='text-xl' />
+                  </button>
+                </>
+              )}
             </div>
           ))}
         </div>

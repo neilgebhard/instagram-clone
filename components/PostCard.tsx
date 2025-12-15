@@ -1,7 +1,12 @@
+'use client'
+
+import { useState, useTransition } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { BsThreeDots, BsTrash } from 'react-icons/bs'
 import LikeButton from './LikeButton'
 import CommentSection from './CommentSection'
+import { deletePost } from '@/app/actions/posts'
 
 type PostCardProps = {
   post: {
@@ -35,13 +40,41 @@ type PostCardProps = {
 }
 
 export default function PostCard({ post, currentUserId }: PostCardProps) {
+  const [isDeleted, setIsDeleted] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)
+  const [isPending, startTransition] = useTransition()
+
+  const isOwner = currentUserId === post.user.id
   const isLiked = post.likes.length > 0
   const likeCount = post._count.likes
+
+  function handleDelete() {
+    if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+      return
+    }
+
+    setIsDeleted(true)
+    setShowMenu(false)
+
+    startTransition(async () => {
+      try {
+        await deletePost(post.id)
+      } catch (error) {
+        console.error('Failed to delete post:', error)
+        setIsDeleted(false)
+        alert('Failed to delete post. Please try again.')
+      }
+    })
+  }
+
+  if (isDeleted) {
+    return null
+  }
 
   return (
     <article className='bg-white border border-gray-300 rounded-sm'>
       {/* Post Header */}
-      <div className='flex items-center gap-3 px-4 py-3'>
+      <div className='flex items-center justify-between px-4 py-3'>
         <Link href={`/${post.user.username}`} className='flex items-center gap-3 hover:opacity-70'>
           {post.user.avatar ? (
             <Image
@@ -60,6 +93,34 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
           )}
           <span className='font-semibold text-sm'>{post.user.username}</span>
         </Link>
+
+        {isOwner && (
+          <div className='relative'>
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              aria-label='Post options'
+              className='p-2 hover:bg-gray-100 rounded-full transition-colors'
+            >
+              <BsThreeDots className='text-xl' />
+            </button>
+
+            {showMenu && (
+              <>
+                <div className='fixed inset-0 z-10' onClick={() => setShowMenu(false)} />
+                <div className='absolute right-0 top-full mt-1 bg-white border border-gray-300 rounded-md shadow-md z-20 overflow-hidden'>
+                  <button
+                    onClick={handleDelete}
+                    disabled={isPending}
+                    className='w-full px-4 py-3 text-left text-sm text-red-500 hover:bg-gray-50 disabled:opacity-50 flex items-center gap-2 cursor-pointer whitespace-nowrap'
+                  >
+                    <BsTrash className='text-base' />
+                    Delete Post
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Post Image */}
