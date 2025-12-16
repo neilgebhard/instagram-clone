@@ -32,3 +32,10 @@ export const mockLike = {
   postId: 'post-123',
   createdAt: new Date('2024-01-01'),
 }
+
+export const mockFollow = {
+  id: 'follow-123',
+  followerId: 'user-123',
+  followingId: 'user-456',
+  createdAt: new Date('2024-01-01'),
+}

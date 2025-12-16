@@ -18,6 +18,23 @@ export async function getUserProfileByUsername(username: string) {
       avatar: true,
       bio: true,
       createdAt: true,
+      _count: {
+        select: {
+          posts: true,
+          followers: true,
+          following: true,
+        },
+      },
+      following: userId
+        ? {
+            where: {
+              followerId: userId,
+            },
+            select: {
+              id: true,
+            },
+          }
+        : false,
       posts: {
         orderBy: { createdAt: 'desc' },
         select: {
@@ -41,10 +58,13 @@ export async function getUserProfileByUsername(username: string) {
   }
 
   return {
-    ...user,
-    _count: {
-      posts: user.posts.length,
-    },
+    id: user.id,
+    username: user.username,
+    avatar: user.avatar,
+    bio: user.bio,
+    createdAt: user.createdAt,
+    _count: user._count,
+    isFollowing: userId ? user.following.length > 0 : undefined,
     posts: user.posts.map((post) => ({
       id: post.id,
       imageUrl: post.imageUrl,

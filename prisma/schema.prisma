@@ -17,9 +17,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  posts    Post[]
-  likes    Like[]
-  comments Comment[]
+  posts     Post[]
+  likes     Like[]
+  comments  Comment[]
+  followers Follow[] @relation("UserFollowers")
+  following Follow[] @relation("UserFollowing")
 }
 
 model Post {
@@ -62,4 +64,18 @@ model Comment {
 
   @@index([postId])
   @@index([userId])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
 }

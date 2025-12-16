@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import EditProfileButton from './EditProfileButton'
 import SignOutButton from './SignOutButton'
+import FollowButton from './FollowButton'
 
 type ProfileHeaderProps = {
   user: {
@@ -9,8 +10,11 @@ type ProfileHeaderProps = {
     avatar: string | null
     bio: string | null
     createdAt: Date
+    isFollowing?: boolean
     _count: {
       posts: number
+      followers: number
+      following: number
     }
   }
   isOwnProfile: boolean
@@ -44,11 +48,18 @@ export default function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps
           <div className='flex-1 space-y-6'>
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4'>
               <h1 className='text-xl font-light'>{user.username}</h1>
-              {isOwnProfile && (
+              {isOwnProfile ? (
                 <>
                   <EditProfileButton />
                   <SignOutButton />
                 </>
+              ) : (
+                user.isFollowing !== undefined && (
+                  <FollowButton
+                    targetUserId={user.id}
+                    initialFollowing={user.isFollowing}
+                  />
+                )
               )}
             </div>
 
@@ -56,6 +67,14 @@ export default function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps
               <div>
                 <span className='font-semibold'>{user._count.posts}</span>{' '}
                 <span className='text-gray-600'>posts</span>
+              </div>
+              <div>
+                <span className='font-semibold'>{user._count.following}</span>{' '}
+                <span className='text-gray-600'>followers</span>
+              </div>
+              <div>
+                <span className='font-semibold'>{user._count.followers}</span>{' '}
+                <span className='text-gray-600'>following</span>
               </div>
             </div>
 
