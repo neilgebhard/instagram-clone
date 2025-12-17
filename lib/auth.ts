@@ -57,6 +57,58 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: '/auth/signin',
   },
   callbacks: {
+    async signIn({ user, account }) {
+      // Only handle OAuth providers (not credentials)
+      if (account?.provider === "google" || account?.provider === "github") {
+        if (!user.email) return false
+
+        try {
+          // Check if user already exists in database
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email }
+          })
+
+          if (!existingUser) {
+            // Generate username from email or profile name
+            let username = user.email.split('@')[0]
+
+            // Check if username already exists and append number if needed
+            let usernameExists = await prisma.user.findUnique({
+              where: { username }
+            })
+
+            let counter = 1
+            while (usernameExists) {
+              username = `${user.email.split('@')[0]}${counter}`
+              usernameExists = await prisma.user.findUnique({
+                where: { username }
+              })
+              counter++
+            }
+
+            // Create new user in database
+            const newUser = await prisma.user.create({
+              data: {
+                email: user.email,
+                username,
+                password: null, // OAuth users don't need passwords
+                avatar: user.image || null,
+              }
+            })
+
+            // Update user.id to match the database ID
+            user.id = newUser.id
+          } else {
+            // Update user.id to match the database ID
+            user.id = existingUser.id
+          }
+        } catch (error) {
+          console.error("Error creating OAuth user:", error)
+          return false
+        }
+      }
+      return true
+    },
     async session({ session, token }) {
       if (session.user && token.sub) {
         session.user.id = token.sub

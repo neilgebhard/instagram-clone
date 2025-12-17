@@ -16,6 +16,8 @@ export default async function Topbar() {
     username = user?.username
   }
 
+  console.log(session)
+
   return (
     <header className='bg-white border-b border-gray-300 sticky top-0 z-50'>
       <div className='max-w-5xl mx-auto px-4 h-16 flex items-center justify-between'>
